@@ -1,0 +1,26 @@
+name: Continuous Integration
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: Continuous Integration (Linux)
+    strategy:
+      matrix:
+        os: ["ubuntu-latest"]
+        rust: ["1.36.0"]
+        clang: ["clang_3_5"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Cache Clang
+        uses: actions/cache@v2
+        with:
+          path: ~/clang
+          key: ${{ matrix.os }}-${{ matrix.clang }}
+      - name: Install Clang
+        run: ./.github/workflows/install-clang.sh ${{ matrix.os }} ${{ matrix.clang }}
+      - name: Install Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.rust }}
